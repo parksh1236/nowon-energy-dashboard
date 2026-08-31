@@ -13,6 +13,18 @@ const day = (yearMonth, label) => {
   if (`${yearMonth.slice(0, 4)}-${match[1]}` !== yearMonth) throw new Error(`조회 월 불일치: ${yearMonth} / ${label}`);
   return `${yearMonth.slice(0, 4)}-${match[1]}-${match[2]}`;
 };
+const metadataByName = new Map([
+  ["공릉2동어린이집", { address: "공릉로 34길 73", contractPowerKw: 150, solarKw: 10 }],
+  ["노원어린이집", { address: "동일로 239 다길 23", contractPowerKw: 25, solarKw: 6 }],
+  ["상계4동어린이집", { address: "덕릉로 130길 6", contractPowerKw: 50, solarKw: null }],
+  ["상계5동보듬이나눔이어린이집", { address: "한글비석로 39길 16-5", contractPowerKw: 69, solarKw: null }],
+  ["월계1동어린이집", { address: "석계로69", contractPowerKw: 40, solarKw: 7 }],
+  ["월계2동어린이집", { address: "월계로45길21", contractPowerKw: 25, solarKw: null }],
+  ["월계3동어린이집", { address: "마들로 31", contractPowerKw: 32, solarKw: 0.9 }],
+  ["중계행복어린이집", { address: "중계로 8길 17", contractPowerKw: 49, solarKw: 3 }],
+  ["청솔창의어린이집", { address: "공릉로59가길 13", contractPowerKw: 35, solarKw: 3 }],
+  ["하계어린이집", { address: "공릉로58마길 1", contractPowerKw: 40, solarKw: 20 }],
+]);
 const harvest = await readJson("powerplanner-harvest.local.json");
 const facilities = await readJson("data/facilities.json");
 const monthlyAll = await readJson("data/monthly.json");
@@ -23,6 +35,8 @@ const baseDay = (await readJson("data/summary.json")).baseDay;
 for (const [offset, source] of harvest.entries()) {
   const existing = facilities.find(facility => facility.name === source.name);
   const id = existing?.id ?? nextId++;
+  const metadata = metadataByName.get(source.name);
+  if (!metadata) throw new Error(`시설 부가정보 없음: ${source.name}`);
   const daily = Object.entries(source.daily).flatMap(([yearMonth, rows]) => rows.map(([label, usage, previous, cost]) => ({
     day: day(yearMonth, label),
     usage_kwh: number(usage),
@@ -30,7 +44,7 @@ for (const [offset, source] of harvest.entries()) {
     cost_won: number(cost),
     temp_max: null,
     temp_min: null,
-    contract_power_kw: source.contractPowerKw,
+    contract_power_kw: metadata.contractPowerKw,
     peak_kw: null,
     solar_kwh: null,
   }))).sort((a, b) => a.day.localeCompare(b.day));
@@ -53,11 +67,11 @@ for (const [offset, source] of harvest.entries()) {
     id,
     name: source.name,
     facilityType: "어린이집",
-    address: "",
+    address: metadata.address,
     floorAreaM2: null,
     note: null,
-    solarKw: null,
-    solarOn: false,
+    solarKw: metadata.solarKw,
+    solarOn: metadata.solarKw != null,
     usagePerAreaKwhM2: null,
     status: source.status === "ok" ? "ok" : "error",
     lastRunAt: "2026-08-31 15:00:00",
