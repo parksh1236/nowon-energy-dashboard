@@ -1,1 +1,1 @@
-[{"day":"2026-10-01","usage_kwh":14.712,"prev_year_usage_kwh":167.452,"cost_won":1142,"temp_max":null,"temp_min":null,"contract_power_kw":50,"peak_kw":2.67,"solar_kwh":null}]
+[{"day":"2026-10-01","usage_kwh":14.712,"prev_year_usage_kwh":167.452,"cost_won":1142,"temp_max":null,"temp_min":null,"contract_power_kw":50,"peak_kw":2.67,"solar_kwh":null},{"day":"2026-10-02","usage_kwh":0,"prev_year_usage_kwh":143.723,"cost_won":0,"temp_max":null,"temp_min":null,"contract_power_kw":50,"peak_kw":null,"solar_kwh":null}]
